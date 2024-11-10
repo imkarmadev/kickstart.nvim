@@ -220,6 +220,10 @@ vim.api.nvim_create_user_command('ZellijFloatPanel', function()
   vim.fn.system 'zellij action new-pane -f'
 end, { desc = 'Open Zellij Float Panel' })
 vim.keymap.set('n', '<leader>pf', ':ZellijFloatPanel<CR>', { desc = '[P]anel Float' })
+
+vim.keymap.set('n', '<leader>bd', ':bd<CR>', { desc = '[B]uffer [D]elete' })
+vim.keymap.set('n', '<leader>dc', 'yaw', { desc = '[C]opy Word' })
+vim.keymap.set('n', '<leader>dr', 'caw<C-r>0<ESC>', { desc = '[R]eplace Word by clipboard' })
 -- [[ Configure and install plugins ]]
 --
 --  To check the current status of your plugins, run
@@ -326,6 +330,7 @@ require('lazy').setup({
         { '<leader>s', group = '[S]earch' },
         { '<leader>w', group = '[W]orkspace' },
         { '<leader>p', group = '[P]anel' },
+        { '<leader>b', group = '[B]uffer' },
       },
     },
     -- config = function()
@@ -688,6 +693,15 @@ require('lazy').setup({
           end,
         },
       }
+      local nvim_lsp = require 'lspconfig'
+      nvim_lsp.denols.setup {
+        root_dir = nvim_lsp.util.root_pattern('deno.json', 'deno.jsonc', 'deno.json5'),
+      }
+
+      nvim_lsp.ts_ls.setup {
+        root_dir = nvim_lsp.util.root_pattern 'package.json',
+        single_file_support = false,
+      }
     end,
   },
 
@@ -956,10 +970,17 @@ require('lazy').setup({
     --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
   },
   {
-    'supermaven-inc/supermaven-nvim',
-    opts = {},
+    'MeanderingProgrammer/dashboard.nvim',
+    event = 'VimEnter',
+    dependencies = {
+      { 'MaximilianLloyd/ascii.nvim', dependencies = { 'MunifTanjim/nui.nvim' } },
+    },
+    config = function()
+      require('dashboard').setup {
+        header = require('ascii').art.text.neovim.sharp,
+      }
+    end,
   },
-
   -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.
